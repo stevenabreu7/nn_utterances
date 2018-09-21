@@ -1,0 +1,89 @@
+Epoch    1 Batch   1500 (97.09%)
+Computing statistics for epoch 1
+Prediction on training data
+tensor([ 73,  73,  73,  ..., 108, 108, 108])
+Training loss : [6.5255065 6.0494967 7.1954727 ... 2.9832296 2.9463336 2.6159487]
+Training accuracy : 0.21796202791460084
+Validation loss : 3.051119
+Validation accuracy : 0.2364966645147407
+
+Epoch    2 Batch   1500 (97.09%)
+Computing statistics for epoch 2
+Prediction on training data
+tensor([108, 108, 108,  ..., 108, 108, 108])
+Training loss : [3.6408393 3.3735995 3.716068  ... 2.853652  2.8160448 2.4638715]
+Training accuracy : 0.2518835452290026
+Validation loss : 2.9180512
+Validation accuracy : 0.2553260167850226
+
+Epoch    3 Batch   1500 (97.09%)
+Computing statistics for epoch 3
+Prediction on training data
+tensor([108, 108, 108,  ..., 108, 108, 108])
+Training loss : [3.449688  2.9783444 3.2263253 ... 2.7952194 2.7675939 2.4182618]
+Training accuracy : 0.26364040680188366
+Validation loss : 2.8993416
+Validation accuracy : 0.25769313535614374
+
+Epoch    4 Batch   1500 (97.09%)
+Computing statistics for epoch 4
+Prediction on training data
+tensor([108, 108, 108,  ..., 108, 108, 108])
+Training loss : [3.4356577 2.9483473 3.1975734 ... 2.7540195 2.72986   2.384235 ]
+Training accuracy : 0.2708366412195953
+Validation loss : 2.8863864
+Validation accuracy : 0.26102862061545085
+
+Epoch    5 Batch   1500 (97.09%)
+Computing statistics for epoch 5
+Prediction on training data
+tensor([108, 108, 108,  ..., 108, 108, 108])
+Training loss : [3.405271  2.8979383 3.1344001 ... 2.7306428 2.7138891 2.3677635]
+Training accuracy : 0.2758360615775933
+Validation loss : 2.8860695
+Validation accuracy : 0.2652248762642565
+
+Epoch    6 Batch   1500 (97.09%)
+Computing statistics for epoch 6
+Prediction on training data
+tensor([108, 111, 108,  ..., 108, 108, 108])
+Training loss : [3.403948  2.906627  3.1569557 ... 2.701815  2.6874838 2.3448594]
+Training accuracy : 0.2797428680893388
+Validation loss : 2.8843143
+Validation accuracy : 0.2669464170432537
+
+Epoch    7 Batch   1500 (97.09%)
+Computing statistics for epoch 7
+Prediction on training data
+tensor([108, 111, 111,  ..., 108, 108, 108])
+Training loss : [3.3905013 2.8942504 3.1445565 ... 2.68038   2.6697915 2.3291442]
+Training accuracy : 0.28297818312945966
+Validation loss : 2.8807669
+Validation accuracy : 0.2674843985366903
+
+Epoch    8 Batch   1500 (97.09%)
+Computing statistics for epoch 8
+Prediction on training data
+tensor([108, 111, 111,  ..., 108, 108, 108])
+Training loss : [3.3801599 2.8818698 3.1351998 ... 2.6686552 2.6595268 2.3199651]
+Training accuracy : 0.2857695914303862
+Validation loss : 2.8718786
+Validation accuracy : 0.2679147837314396
+
+Epoch    9 Batch   1500 (97.09%)
+Computing statistics for epoch 9
+Prediction on training data
+tensor([108, 111, 111,  ..., 108, 108, 108])
+Training loss : [3.3647113 2.8617587 3.1130116 ... 2.6562462 2.6446333 2.3018675]
+Training accuracy : 0.28822473616903305
+Validation loss : 2.8619764
+Validation accuracy : 0.2695287282117495
+
+Epoch   10 Batch   1500 (97.09%)
+Computing statistics for epoch 10
+Prediction on training data
+tensor([108, 111, 111,  ..., 108, 108, 108])
+Training loss : [3.3523886 2.8537593 3.10293   ... 2.6465044 2.6323783 2.2913148]
+Training accuracy : 0.2901930592999983
+Validation loss : 2.856748
+Validation accuracy : 0.2708198837959974

@@ -1,0 +1,55 @@
+epochs = 30
+learning_rate = 0.1
+batch_size = 10000
+
+# 40 - 2000 - 1000 - 500 - 250 - 138
+net = nn.Sequential(
+    nn.Linear(40, 2000),
+    nn.Sigmoid(),
+    nn.Linear(2000, 1000),
+    nn.Sigmoid(),
+    nn.Linear(1000, 500),
+    nn.Sigmoid(),
+    nn.Linear(500, 250),
+    nn.Sigmoid(),
+    nn.Linear(250,138)
+)
+
+
+Logs:
+
+Epoch    1 Batch   1500 (97.09%)
+Computing statistics for epoch 1
+Prediction on training data
+tensor([ 74,  74,  74,  ..., 108, 108, 108])
+Training loss : [4.967241  4.92777   4.8907657 ... 4.1260786 4.1040125 4.020563 ]
+Training accuracy : 0.059994274133836525
+Validation loss : 4.13993
+Validation accuracy : 0.08198837959974177
+
+Epoch   10 Batch   1500 (97.09%)
+Computing statistics for epoch 10
+Prediction on training data
+tensor([108, 108, 108,  ..., 108, 108, 108])
+Training loss : [3.5774403 3.2362108 3.5012937 ... 3.2045617 3.1951666 2.9315712]
+Training accuracy : 0.20291211365048176
+Validation loss : 3.1721904
+Validation accuracy : 0.21745211964708414
+
+Epoch   20 Batch   1500 (97.09%)
+Computing statistics for epoch 20
+Prediction on training data
+tensor([108, 108, 108,  ..., 108, 108, 108])
+Training loss : [3.4174988 3.0430741 3.3067923 ... 2.993593  2.9728544 2.6917646]
+Training accuracy : 0.2357946121580088
+Validation loss : 3.0046268
+Validation accuracy : 0.2416612868517323
+
+Epoch   30 Batch   1500 (97.09%)
+Computing statistics for epoch 30
+Prediction on training data
+tensor([108, 108, 108,  ..., 108, 108, 108])
+Training loss : [3.3265452 2.9452367 3.2129776 ... 2.8801498 2.8617003 2.575359 ]
+Training accuracy : 0.2530033449647946
+Validation loss : 2.942585
+Validation accuracy : 0.25005379814934364
