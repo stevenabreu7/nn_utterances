@@ -2,7 +2,8 @@ from classes import *
 
 # Load the data
 
-print('Loading data')
+trainx, trainy, valx, valy = load_training_data(20)
+
 # network 3
 name = 'adam'
 layers = [410, 400, 400, 400, 400, 400, 138]
