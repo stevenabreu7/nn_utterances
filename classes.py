@@ -124,8 +124,9 @@ def training_routine(name, net, dataset, epochs, lr, optimizer=None, batch_size=
     net = net.cuda() if gpu else net
     
     for epoch in range(epochs):
-        
-        scheduler.step()
+
+        if decay:
+            scheduler.step()
 
         train_correct = 0
         train_loss = []
