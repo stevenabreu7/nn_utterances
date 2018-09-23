@@ -67,7 +67,7 @@ def pad_array_temporally(X, padding):
     rest = [left_shift(X,i) for i in range(0, padding+1)]
     return np.concatenate(before + rest, axis=1)
 
-def load_training_data():
+def load_training_data(padding=20):
     # Getting the labels
     trainy = np.load('data/train_labels.npy', encoding='bytes')
     valy = np.load('data/dev_labels.npy', encoding='bytes')
@@ -92,7 +92,6 @@ def load_training_data():
         np.save('data/testx_pca.npy', testxs)
         np.save('data/valx_pca.npy', valxs)
     # add context
-    padding = 20
     trainx = pad_array_temporally(trainx, padding)
     valx = pad_array_temporally(valx, padding)
     # Turn into tensors
@@ -104,8 +103,8 @@ def load_training_data():
     # return
     return trainx, trainy, valx, valy
 
-def training_routine(name, net, dataset, epochs, lr, batch_size=5000, decay=True, logging=False):
-    print('Training {}'.format(name))
+def training_routine(name, net, dataset, epochs, lr, optimizer=None, batch_size=5000, decay=True, logging=False):
+
     if logging:
         vLog = Logger('./logs/val_acc_{}'.format(name))
         tLog = Logger('./logs/train_acc_{}'.format(name))
@@ -113,7 +112,8 @@ def training_routine(name, net, dataset, epochs, lr, batch_size=5000, decay=True
     train_data, train_labels, val_data, val_labels = dataset
     
     criterion=nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(net.parameters(), lr=lr)
+    if not optimizer:
+        optimizer = torch.optim.SGD(net.parameters(), lr=lr)
     if decay:
         scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.3)
     
