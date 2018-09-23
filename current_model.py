@@ -1,10 +1,9 @@
 from classes import *
 
 # Load the data
-
 trainx, trainy, valx, valy = load_training_data(20)
 
-# network 3
+# adam standard
 name = 'adam'
 layers = [410, 400, 400, 400, 400, 400, 138]
 batch_norm = True

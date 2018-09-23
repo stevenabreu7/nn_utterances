@@ -1,5 +1,6 @@
 import os
 import torch
+import random
 import optparse
 import numpy as np
 import torch.nn as nn
@@ -88,9 +89,9 @@ def load_training_data(padding=20):
         trainx = PCA(n_components=10).fit_transform(trainx)
         testx = PCA(n_components=10).fit_transform(testx)
         valx = PCA(n_components=10).fit_transform(valx)
-        np.save('data/trainx_pca.npy', trainxs)
-        np.save('data/testx_pca.npy', testxs)
-        np.save('data/valx_pca.npy', valxs)
+        np.save('data/trainx_pca.npy', trainx)
+        np.save('data/testx_pca.npy', testx)
+        np.save('data/valx_pca.npy', valx)
     # add context
     trainx = pad_array_temporally(trainx, padding)
     valx = pad_array_temporally(valx, padding)
@@ -103,7 +104,7 @@ def load_training_data(padding=20):
     # return
     return trainx, trainy, valx, valy
 
-def training_routine(name, net, dataset, epochs, lr, optimizer=None, batch_size=5000, decay=True, logging=False):
+def training_routine(name, net, dataset, epochs, lr, optimizer=None, batch_size=64, decay=True, logging=False):
 
     if logging:
         vLog = Logger('./logs/val_acc_{}'.format(name))
@@ -129,13 +130,18 @@ def training_routine(name, net, dataset, epochs, lr, optimizer=None, batch_size=
         train_correct = 0
         train_loss = []
 
+        batch_indices = list(range(train_data.shape[0]))
+        random.shuffle(batch_indices)
+
         for batch_n in range(0, train_data.shape[0], batch_size):
             
-            if (batch_n // batch_size) % 10 == 0:
+            if (batch_n // batch_size) % 1000 == 0:
                 print('\rEpoch {:4} Batch {:6} ({:.2%})'.format(epoch + 1, batch_n // batch_size, batch_n / train_data.shape[0]), end='')
             
-            a, b = batch_n, batch_n + batch_size
-            batch_data, batch_labels = train_data[a:b], train_labels[a:b]
+            # a, b = batch_n, batch_n + batch_size
+            # batch_data, batch_labels = train_data[a:b], train_labels[a:b]
+            indices = [batch_indices.pop() for i in range(batch_size) if batch_indices]
+            batch_data, batch_labels = train_data[indices], train_labels[indices]
 
             if gpu:
                 batch_data, batch_labels = batch_data.cuda(), batch_labels.cuda()
@@ -217,7 +223,7 @@ def training_routine(name, net, dataset, epochs, lr, optimizer=None, batch_size=
 
             # try to save the neural network
             try:
-                torch.save(net, 'neural_net_{}'.format(name))
+                torch.save(net, 'models/neural_net_{}'.format(name))
             except:
                 print('Could not save neural network.')
 
