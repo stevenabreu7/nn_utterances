@@ -105,7 +105,7 @@ def load_training_data():
     return trainx, trainy, valx, valy
 
 def training_routine(name, net, dataset, epochs, lr, batch_size=5000, decay=True, logging=False):
-
+    print('Training {}'.format(name))
     if logging:
         vLog = Logger('./logs/val_acc_{}'.format(name))
         tLog = Logger('./logs/train_acc_{}'.format(name))

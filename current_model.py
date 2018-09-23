@@ -2,6 +2,7 @@ from classes import *
 
 # Load the data
 
+print('Loading data')
 trainx, trainy, valx, valy = load_training_data()
 
 # # network 1
