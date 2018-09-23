@@ -103,7 +103,7 @@ def load_training_data(padding=20):
     # return
     return trainx, trainy, valx, valy
 
-def training_routine(name, net, dataset, epochs, lr, batch_size=5000, decay=True, logging=False):
+def training_routine(name, net, dataset, epochs, lr, optimizer=None, batch_size=5000, decay=True, logging=False):
 
     if logging:
         vLog = Logger('./logs/val_acc_{}'.format(name))
@@ -112,7 +112,8 @@ def training_routine(name, net, dataset, epochs, lr, batch_size=5000, decay=True
     train_data, train_labels, val_data, val_labels = dataset
     
     criterion=nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(net.parameters(), lr=lr)
+    if not optimizer:
+        optimizer = torch.optim.SGD(net.parameters(), lr=lr)
     if decay:
         scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.3)
     
