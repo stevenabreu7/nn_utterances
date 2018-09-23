@@ -2,7 +2,7 @@ from classes import *
 
 # Load the data
 
-trainx, trainy, valx, valy = load_training_data()
+trainx, trainy, valx, valy = load_training_data(20)
 
 # # network 1
 # name = 'id1'

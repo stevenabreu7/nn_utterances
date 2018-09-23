@@ -67,7 +67,7 @@ def pad_array_temporally(X, padding):
     rest = [left_shift(X,i) for i in range(0, padding+1)]
     return np.concatenate(before + rest, axis=1)
 
-def load_training_data():
+def load_training_data(padding=20):
     # Getting the labels
     trainy = np.load('data/train_labels.npy', encoding='bytes')
     valy = np.load('data/dev_labels.npy', encoding='bytes')
@@ -92,7 +92,6 @@ def load_training_data():
         np.save('data/testx_pca.npy', testxs)
         np.save('data/valx_pca.npy', valxs)
     # add context
-    padding = 20
     trainx = pad_array_temporally(trainx, padding)
     valx = pad_array_temporally(valx, padding)
     # Turn into tensors
