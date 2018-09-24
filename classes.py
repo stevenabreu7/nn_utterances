@@ -58,9 +58,7 @@ class Logger(object):
         self.writer.add_summary(summary, step)
         self.writer.flush()
 
-
-# ### Loading data
-
+# Loading data
 def pad_array_temporally(X, padding):
     right_shift = lambda X, i : np.pad(X[:-i], [(i,0),(0,0)], 'constant', constant_values=0)
     left_shift = lambda X, i : np.pad(X[i:], [(0,i),(0,0)], 'constant', constant_values=0)
@@ -68,37 +66,32 @@ def pad_array_temporally(X, padding):
     rest = [left_shift(X,i) for i in range(0, padding+1)]
     return np.concatenate(before + rest, axis=1)
 
-def load_training_data(padding=20):
+def load_training_data(padding=20, pca_dim=None):
     # Getting the labels
     trainy = np.load('data/train_labels.npy', encoding='bytes')
     valy = np.load('data/dev_labels.npy', encoding='bytes')
     trainy = np.concatenate(trainy.tolist())
     valy = np.concatenate(valy.tolist())
-    # PCA
-    if os.path.exists('data/trainx_pca.npy'):
-        trainx = np.load('data/trainx_pca.npy')
-        testx = np.load('data/testx_pca.npy')
-        valx = np.load('data/valx_pca.npy')
+    # Getting the training and validation data
+    if pca_dim and os.path.exists('data/trainx_pca_{}.npy'.format(pca_dim)):
+        trainx = np.load('data/trainx_pca_{}.npy'.format(pca_dim))
+        valx = np.load('data/valx_pca_{}.npy'.format(pca_dim))
     else:
         trainx = np.load('data/train.npy', encoding='bytes')
-        testx = np.load('data/test.npy', encoding='bytes')
         valx = np.load('data/dev.npy', encoding='bytes')
         trainx = np.concatenate(trainx.tolist())
-        testx = np.concatenate(testx.tolist())
         valx = np.concatenate(valx.tolist())
-        trainx = PCA(n_components=10).fit_transform(trainx)
-        testx = PCA(n_components=10).fit_transform(testx)
-        valx = PCA(n_components=10).fit_transform(valx)
-        np.save('data/trainx_pca.npy', trainx)
-        np.save('data/testx_pca.npy', testx)
-        np.save('data/valx_pca.npy', valx)
+        if pca_dim:
+            trainx = PCA(n_components=pca_dim).fit_transform(trainx)
+            valx = PCA(n_components=pca_dim).fit_transform(valx)
+            np.save('data/trainx_pca_{}.npy'.format(pca_dim), trainx)
+            np.save('data/valx_pca_{}.npy'.format(pca_dim), valx)
     # add context
     trainx = pad_array_temporally(trainx, padding)
     valx = pad_array_temporally(valx, padding)
     # Turn into tensors
     trainx = torch.from_numpy(trainx).float()
     trainy = torch.from_numpy(trainy.astype(int))
-    testx = torch.from_numpy(testx).float()
     valx = torch.from_numpy(valx).float()
     valy = torch.from_numpy(valy.astype(int))
     # return
