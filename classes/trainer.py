@@ -1,112 +1,23 @@
-import os
+# general imports
 import torch
-import random
-import optparse
-import numpy as np
-import torch.nn as nn
-import tensorflow as tf
-import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
-from torch.utils.data.dataset import Dataset
+# library imports
+from torch.utils.data import DataLoader
+# first party imports
+from logger import Logger
+from customDataset import CustomDataset
 
-criterion = torch.nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(net.parameters(), lr=lr)
-scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.3)
-
-class Logger(object):
-    """Logging in tensorboard without tensorflow ops."""
-
-    def __init__(self, log_dir):
-        self.writer = tf.summary.FileWriter(log_dir)
-
-    def log_scalar(self, tag, value, step):
-        """Log a scalar variable.
-        Parameter
-        ----------
-        tag : Name of the scalar
-        value : value itself
-        step :  training iteration
-        """
-        # Notice we're using the Summary "class" instead of the "tf.summary" public API.
-        summary = tf.Summary(value=[tf.Summary.Value(tag=tag, simple_value=value)])
-        self.writer.add_summary(summary, step)
-
-    def log_histogram(self, tag, values, step, bins=1000):
-        """Logs the histogram of a list/vector of values."""
-        # Convert to a numpy array
-        values = np.array(values)
+class Trainer():
+    def __init__(self, trainx, trainy, valx, valy, padding, context, batch_size):
+        self.input_dim = 40 * (2 * padding + 1)
+        self.output_dim = 138
+        train_dataset = CustomDataset('data/train.npy', 'data/train_labels.npy', padding, context)
+        val_dataset = CustomDataset('data/dev.npy', 'data/dev_labels.npy', padding, context)
+        self.train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+        self.val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
         
-        # Create histogram using numpy        
-        counts, bin_edges = np.histogram(values, bins=bins)
-
-        # Fill fields of histogram proto
-        hist = tf.HistogramProto()
-        hist.min = float(np.min(values))
-        hist.max = float(np.max(values))
-        hist.num = int(np.prod(values.shape))
-        hist.sum = float(np.sum(values))
-        hist.sum_squares = float(np.sum(values**2))
-
-        # Requires equal number as bins, where the first goes from -DBL_MAX to bin_edges[1]
-        # See https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/summary.proto#L30
-        # Thus, we drop the start of the first bin
-        bin_edges = bin_edges[1:]
-
-        # Add bin edges and counts
-        for edge in bin_edges:
-            hist.bucket_limit.append(edge)
-        for c in counts:
-            hist.bucket.append(c)
-
-        # Create and write Summary
-        summary = tf.Summary(value=[tf.Summary.Value(tag=tag, histo=hist)])
-        self.writer.add_summary(summary, step)
-        self.writer.flush()
-
-class CustomDataset(Dataset):
-    def __init__(self, data_file, label_file, padding, context):
-        # save the context and padding
-        self.padding = padding
-        self.context = context
-        # load data
-        self.X = np.load(data_file, encoding='bytes')
-        self.y = np.load(label_file, encoding='bytes')
-        # get length
-        self.length = sum([e.shape[0] for e in self.X])
-        # helper list for determining index
-        self.lol = np.array([e.shape[0] for e in self.X]).cumsum()
-        # pad data with zeros between utterances
-        for i in range(self.X.shape[0]):
-            pad = np.zeros((self.padding, self.X[i].shape[1]))
-            self.X[i] = np.concatenate([pad, self.X[i], pad])
-        # flatten array to list of frames, separated by zeros
-        self.X = np.concatenate(self.X.tolist())
-        self.y = np.concatenate(self.y.tolist())
-    
-    def __getitem__(self, index):
-        # getting y
-        y = self.y[index]
-        # determining index for X
-        index += self.padding
-        i = 0
-        while i < len(self.lol) and index >= self.lol[i]:
-            index += 2 * self.padding
-            i += 1
-        # getting X
-        X = self.X[index - self.context : index + self.context + 1]
-        return X, y
-    
-    def __len__(self):
-        return self.length
-
-class Trainer:
-    def __init__(self, train_loader, val_loader):
-        self.train_loader = train_loader
-        self.val_loader = val_loader
-
-    def training_routine(self, name, net, epochs, criterion, optimizer, scheduler, logging):
+    def training_routine(self, model):
         """ Train a neural network.
-        Arguments:
+        Model parameters:
             name            Name of the model that is to be trained
             net             Pytorch network for this model
             train_loader    DataLoader class instance with the training data
@@ -117,6 +28,13 @@ class Trainer:
             scheduler       Scheduler to use (optional, no scheduler will be used if None)
             logging         True/False, whether or not to log to Tensorboard
         """
+        name = model.name
+        net = model.net 
+        epochs = model.epochs 
+        criterion = model.criterion
+        optimizer = model.optimizer
+        scheduler = model.scheduler
+        logging = model.logging
 
         # initialize tensorboard logging
         if logging:
@@ -141,7 +59,7 @@ class Trainer:
             train_loss = []
 
             # train the network
-            for batch_n, (batch_data, batch_labels) in enumerate(self.train_loader)
+            for batch_n, (batch_data, batch_labels) in enumerate(self.train_loader):
                 
                 if batch_n % 100 == 0:
                     print('\rTraining epoch {:4} Batch {:6} ({:.2%})'.format(epoch + 1, batch_n, batch_n / len(self.train_loader)), end=' ' * 10)
@@ -173,7 +91,7 @@ class Trainer:
             val_loss = []
             val_accuracy = 0
             
-            for batch_n, (batch_data, batch_labels) in enumerate(self.val_loader)
+            for batch_n, (batch_data, batch_labels) in enumerate(self.val_loader):
                 
                 if gpu:
                     batch_data, batch_labels = batch_data.cuda(), batch_labels.cuda()
@@ -191,7 +109,7 @@ class Trainer:
                 val_loss.append(batch_loss.cpu().detach())
                 
             # print the statistics
-            print("Training loss :",train_loss.cpu().detach().numpy())
+            print("Training loss :",train_loss)
             print("Training accuracy :",train_accuracy)
             print("Validation loss :",val_loss)
             print("Validation accuracy :",val_accuracy)
@@ -214,14 +132,3 @@ class Trainer:
         
         # move the network back to CPU
         net = net.cpu()
-
-def generate_net(layers, batch_norm=True):
-    model = []
-    for i in range(len(layers)-1):
-        model.append(nn.Linear(layers[i], layers[i+1]))
-        if i < (len(layers)-2):
-            if batch_norm:
-                model.append(nn.BatchNorm1d(layers[i+1]))
-            model.append(nn.LeakyReLU())
-    net = nn.Sequential(*tuple(model))
-    return net
