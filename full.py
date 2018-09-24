@@ -78,9 +78,11 @@ class Trainer():
                 batch_correct = (batch_prediction.numpy() == batch_labels.cpu().detach().numpy()).sum()
                 
                 # track overall epoch performance
-                train_accuracy += batch_correct / len(self.train_loader.dataset)
+                train_accuracy += batch_correct
                 train_loss.append(batch_loss.cpu().detach())
             
+            train_accuracy /= len(self.train_loader.dataset)
+
             # print statistics
             print('\rValidation epoch {:4}'.format(epoch + 1), end=' ' * 30)
             
@@ -102,8 +104,10 @@ class Trainer():
                 batch_correct += (batch_prediction.numpy() == batch_labels.cpu().detach().numpy()).sum()
 
                 # track overall epoch performance
-                val_accuracy += batch_correct / len(self.val_loader.dataset)
+                val_accuracy += batch_correct
                 val_loss.append(batch_loss.cpu().detach())
+
+            val_accuracy /= len(self.val_loader.dataset)
                 
             # print the statistics
             print("Training loss :",train_loss)
