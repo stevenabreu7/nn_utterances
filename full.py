@@ -215,7 +215,6 @@ class CustomDataset(Dataset):
         X = self.X[index - self.context : index + self.context + 1]
         X = np.concatenate(X.tolist())
         X = torch.from_numpy(X).float()
-        y = torch.from_numpy(y.astype(int))
         return X, y
     
     def __len__(self):
