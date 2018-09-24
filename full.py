@@ -66,6 +66,7 @@ class Trainer():
                     batch_data, batch_labels = batch_data.cuda(), batch_labels.cuda()
 
                 # forward pass
+                print(batch_data.shape)
                 batch_output = net(batch_data)
                 batch_loss = criterion(batch_output, batch_labels)
                 
