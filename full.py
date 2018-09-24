@@ -215,6 +215,8 @@ class CustomDataset(Dataset):
         X = self.X[index - self.context : index + self.context + 1]
         X = np.concatenate(X.tolist())
         X = torch.from_numpy(X).float()
+        print(y)
+        print(y.shape)
         y = torch.from_numpy(y).float()
         return X, y
     
