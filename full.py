@@ -59,7 +59,6 @@ class Trainer():
             # train the network
             for batch_n, (batch_data, batch_labels) in enumerate(self.train_loader):
                 
-                # if batch_n % 100 == 0:
                 print('\rTraining epoch {:4} Batch {:6} ({:.2%})'.format(epoch + 1, batch_n, batch_n / len(self.train_loader)), end=' ' * 10)
 
                 if gpu:
@@ -189,31 +188,37 @@ class CustomDataset(Dataset):
         # load data
         self.X = np.load(data_file, encoding='bytes')
         self.y = np.load(label_file, encoding='bytes')
-        # get length
-        self.length = sum([e.shape[0] for e in self.X])
-        # helper list for determining index
-        self.lol = np.array([e.shape[0] for e in self.X]).cumsum()
-        # pad data with zeros between utterances
+        # padding for each utterance
+        pad = np.zeros((self.padding, self.X[0].shape[1]))
+        # map for actual indices
+        self.index_map = []
+        # keep track of actual index
+        actual_i = 0
         for i in range(self.X.shape[0]):
-            pad = np.zeros((self.padding, self.X[i].shape[1]))
+            # add padding to utterance
             self.X[i] = np.concatenate([pad, self.X[i], pad])
-        # flatten array to list of frames, separated by zeros
+            # map the indices correctly
+            actual_i += self.context
+            for j in range(self.X[i].shape[0]):
+                self.index_map.append(actual_i)
+                actual_i += 1
+            actual_i += self.context
+        # flatten array to list of frames
         self.X = np.concatenate(self.X.tolist())
+        self.X = torch.tensor(self.X).float()
         self.y = np.concatenate(self.y.tolist())
+        # save length
+        self.length = self.y.shape[0]
     
     def __getitem__(self, index):
         # getting y
         y = self.y[index]
         # determining index for X
-        index += self.padding
-        i = 0
-        while i < len(self.lol) and index >= self.lol[i]:
-            index += 2 * self.padding
-            i += 1
+        a = self.index_map[index] - self.context
+        b = self.index_map[index] + self.context + 1
         # getting X
-        X = self.X[index - self.context : index + self.context + 1]
-        X = np.concatenate(X.tolist())
-        X = torch.from_numpy(X).float()
+        X = self.X[a:b].view(-1)
+        # return it
         return X, y
     
     def __len__(self):
