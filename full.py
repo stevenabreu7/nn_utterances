@@ -199,8 +199,8 @@ class CustomDataset(Dataset):
             pad = np.zeros((self.padding, self.X[i].shape[1]))
             self.X[i] = np.concatenate([pad, self.X[i], pad])
         # flatten array to list of frames, separated by zeros
-        self.X = torch.from_numpy(np.concatenate(self.X.tolist())).float()
-        self.y = torch.from_numpy(np.concatenate(self.y.tolist())).float()
+        self.X = np.concatenate(self.X.tolist())
+        self.y = np.concatenate(self.y.tolist())
     
     def __getitem__(self, index):
         # getting y
@@ -213,6 +213,9 @@ class CustomDataset(Dataset):
             i += 1
         # getting X
         X = self.X[index - self.context : index + self.context + 1]
+        X = np.concatenate(X.tolist())
+        X = torch.from_numpy(X).float()
+        y = torch.from_numpy(y).float()
         return X, y
     
     def __len__(self):
