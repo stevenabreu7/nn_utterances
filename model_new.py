@@ -1,6 +1,5 @@
 import torch
-from classes.model import Model
-from classes.trainer import Trainer
+from classes import Trainer, Model
 
 # general initialization
 padding, context = 10, 10
