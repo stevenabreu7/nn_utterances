@@ -110,9 +110,9 @@ class Trainer():
             val_accuracy /= len(self.val_loader.dataset)
                 
             # print the statistics
-            print("Training loss :",train_loss)
+            # print("Training loss :",train_loss)
             print("Training accuracy :",train_accuracy)
-            print("Validation loss :",val_loss)
+            # print("Validation loss :",val_loss)
             print("Validation accuracy :",val_accuracy)
             print()
             
