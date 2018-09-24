@@ -59,14 +59,13 @@ class Trainer():
             # train the network
             for batch_n, (batch_data, batch_labels) in enumerate(self.train_loader):
                 
-                if batch_n % 100 == 0:
-                    print('\rTraining epoch {:4} Batch {:6} ({:.2%})'.format(epoch + 1, batch_n, batch_n / len(self.train_loader)), end=' ' * 10)
+                # if batch_n % 100 == 0:
+                print('\rTraining epoch {:4} Batch {:6} ({:.2%})'.format(epoch + 1, batch_n, batch_n / len(self.train_loader)), end=' ' * 10)
 
                 if gpu:
                     batch_data, batch_labels = batch_data.cuda(), batch_labels.cuda()
 
                 # forward pass
-                print(batch_data.shape)
                 batch_output = net(batch_data)
                 batch_loss = criterion(batch_output, batch_labels)
                 
