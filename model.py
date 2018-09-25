@@ -2,6 +2,7 @@ import torch
 import numpy as np 
 import torch.nn as nn
 from torch.functional import F
+from sklearn.decomposition import PCA
 from torch.utils.data import Dataset, DataLoader, RandomSampler
 from torch.autograd.variable import Variable
 
@@ -21,6 +22,13 @@ class CustomDataset(Dataset):
         x zeros, with x being the context.
         """
         self.context = context 
+
+        print('Running PCA...')
+        if pca:
+            LEN_FRAME = pca 
+            p = PCA(n_components=pca)
+            data = p.fit_transform(data)
+        print('Done with PCA')
 
         # padding for each utterance
         padding = np.zeros((self.context, LEN_FRAME))
@@ -76,8 +84,8 @@ def load_data(context, pca=None):
     train_labels = np.load('data/train_labels.npy', encoding='bytes')
     val_data = np.load('data/dev.npy', encoding='bytes')
     val_labels = np.load('data/dev_labels.npy', encoding='bytes')
-    train_dataset = CustomDataset(train_data, train_labels, context)
-    val_dataset = CustomDataset(val_data, val_labels, context)
+    train_dataset = CustomDataset(train_data, train_labels, context, pca)
+    val_dataset = CustomDataset(val_data, val_labels, context, pca)
     return train_dataset, val_dataset
 
 class CustomNetwork(nn.Module):
@@ -287,10 +295,11 @@ def init_xavier(m):
 # data parameters
 context = 15
 batch_size = 10000
+pca = 10
 
 # datasets and loaders
 print('Loading datasets')
-train_dataset, val_dataset = load_data(context)
+train_dataset, val_dataset = load_data(context, pca=pca)
 train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=RandomSampler(train_dataset))
 val_loader = DataLoader(val_dataset, batch_size=batch_size, sampler=RandomSampler(val_dataset))
 
