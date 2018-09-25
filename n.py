@@ -13,7 +13,7 @@ from torch.functional import F
 FRAME_LEN = 40
 LEN_FRAME = 40
 NUM_PHONEMES = 138
-LEN_PHONEMES = 138
+LEN_PHONEME = 138
 
 class CustomDataset(Dataset):
     def __init__(self, utterances_path, labels_path, context, pca=None):
