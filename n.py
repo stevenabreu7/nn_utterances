@@ -85,51 +85,47 @@ def load_data(context, pca=None):
     return train_dataset, val_dataset
 
 class PhonemeModel(nn.Module):
-    def __init__(self, context):
-        """ Custom network, takes context as argument.
-        Architecture: 
-            1000 x 1000 x 1000 x 500 x 250 x 250
-        """
-        super(PhonemeModel, self).__init__()
-        # input and output size
-        input_n = (2 * context + 1) * LEN_FRAME
-        output_n = LEN_PHONEME
-        # layers
-        self.layer1 = nn.Linear(input_n, 1024)
-        self.layer1b = nn.modules.BatchNorm1d(1024)
-        self.layer2 = nn.Linear(1024, 1024)
-        self.layer2b = nn.modules.BatchNorm1d(1024)
-        self.layer3 = nn.Linear(1024, 1024)
-        self.layer3b = nn.modules.BatchNorm1d(1024)
-        self.layer4 = nn.Linear(1024, 512)
-        self.layer4b = nn.modules.BatchNorm1d(512)
-        self.layer5 = nn.Linear(512, 256)
-        self.layer5b = nn.modules.BatchNorm1d(256)
-        self.layer6 = nn.Linear(256, 256)
-        self.layer6b = nn.modules.BatchNorm1d(256)
-        self.layer7 = nn.Linear(256, output_n)
     
+    def __init__(self, context):
+        super(PhonemeModel, self).__init__()
+        self.input_size = (2 * context + 1) * FRAME_LEN
+        self.output_size = NUM_PHONEMES
+        
+        self.layer1 = nn.Linear(self.input_size, 1024)
+        self.layer1bn = nn.modules.BatchNorm1d(1024)
+        self.layer2 = nn.Linear(1024, 1024)
+        self.layer2bn = nn.modules.BatchNorm1d(1024)
+        self.layer3 = nn.Linear(1024, 1024)
+        self.layer3bn = nn.modules.BatchNorm1d(1024)
+        self.layer4 = nn.Linear(1024, 512)
+        self.layer4bn = nn.modules.BatchNorm1d(512)
+        self.layer5 = nn.Linear(512, 256)
+        self.layer5bn = nn.modules.BatchNorm1d(256)
+        self.layer6 = nn.Linear(256, 256)
+        self.layer6bn = nn.modules.BatchNorm1d(256)
+        self.layer7 = nn.Linear(256, self.output_size)
+        
     def forward(self, x):
         x = self.layer1(x)
-        x = self.layer1b(x)
+        x = self.layer1bn(x)
         x = F.leaky_relu(x)
         x = self.layer2(x)
-        x = self.layer2b(x)
+        x = self.layer2bn(x)
         x = F.leaky_relu(x)
         x = self.layer3(x)
-        x = self.layer3b(x)
+        x = self.layer3bn(x)
         x = F.leaky_relu(x)
         x = self.layer4(x)
-        x = self.layer4b(x)
+        x = self.layer4bn(x)
         x = F.leaky_relu(x)
         x = self.layer5(x)
-        x = self.layer5b(x)
+        x = self.layer5bn(x)
         x = F.leaky_relu(x)
         x = self.layer6(x)
-        x = self.layer6b(x)
+        x = self.layer6bn(x)
         x = F.leaky_relu(x)
         x = self.layer7(x)
-        return x 
+        return x
 
 def inference(model, loader, gpu):
     num_predicted = 0
