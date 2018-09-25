@@ -11,6 +11,7 @@ from torch.utils.data import Dataset, DataLoader, RandomSampler
 from torch.functional import F
 
 FRAME_LEN = 40
+LEN_FRAME = 40
 NUM_PHONEMES = 138
 
 class CustomDataset(Dataset):
