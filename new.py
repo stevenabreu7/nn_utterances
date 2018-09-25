@@ -32,6 +32,7 @@ class CustomDataset(Dataset):
         # keep track of actual index
         actual_i = 0
         for d in data:
+            # add padding before and after each utterance
             frames.append(padding)
             frames.append(d)
             frames.append(padding)
@@ -90,19 +91,19 @@ class CustomNetwork(nn.Module):
         input_n = (2 * context + 1) * LEN_FRAME
         output_n = LEN_PHONEME
         # layers
-        self.layer1 = nn.Linear(input_n, 1024)
-        self.layer1b = nn.modules.BatchNorm1d(1024)
-        self.layer2 = nn.Linear(1024, 1024)
-        self.layer2b = nn.modules.BatchNorm1d(1024)
-        self.layer3 = nn.Linear(1024, 1024)
-        self.layer3b = nn.modules.BatchNorm1d(1024)
-        self.layer4 = nn.Linear(1024, 512)
-        self.layer4b = nn.modules.BatchNorm1d(512)
-        self.layer5 = nn.Linear(512, 256)
-        self.layer5b = nn.modules.BatchNorm1d(256)
-        self.layer6 = nn.Linear(256, 256)
-        self.layer6b = nn.modules.BatchNorm1d(256)
-        self.layer7 = nn.Linear(256, output_n)
+        self.layer1 = nn.Linear(input_n, 1000)
+        self.layer1b = nn.modules.BatchNorm1d(1000)
+        self.layer2 = nn.Linear(1000, 1000)
+        self.layer2b = nn.modules.BatchNorm1d(1000)
+        self.layer3 = nn.Linear(1000, 1000)
+        self.layer3b = nn.modules.BatchNorm1d(1000)
+        self.layer4 = nn.Linear(1000, 500)
+        self.layer4b = nn.modules.BatchNorm1d(500)
+        self.layer5 = nn.Linear(500, 250)
+        self.layer5b = nn.modules.BatchNorm1d(250)
+        self.layer6 = nn.Linear(250, 250)
+        self.layer6b = nn.modules.BatchNorm1d(250)
+        self.layer7 = nn.Linear(250, output_n)
     
     def forward(self, x):
         x = self.layer1(x)
@@ -282,7 +283,7 @@ def init_xavier(m):
         m.weight.data.normal_(0,std)
 
 # data parameters
-context = 14
+context = 15
 batch_size = 10000
 
 # datasets and loaders
@@ -303,6 +304,6 @@ criterion = nn.modules.loss.CrossEntropyLoss()
 trainer = Trainer(train_loader, val_loader, 'new_test', net, optimizer, criterion, None)
 
 # run the training
-epochs = 5
+epochs = 10
 trainer.train(epochs)
 trainer.save_model()
