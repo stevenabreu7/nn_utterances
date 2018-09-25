@@ -114,7 +114,7 @@ class PhonemeDataset(Dataset):
 
         self.frames = torch.tensor(self.frames).float()
         self.labels = torch.tensor(np.concatenate(utterance_labels))
-        self.instance_size = (2 * self.context + 1) * LEN_FRAME
+        self.el_length = (2 * self.context + 1) * LEN_FRAME
 
     def __len__(self):
         # changed
