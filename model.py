@@ -216,7 +216,7 @@ class Trainer:
             
             # compute epoch loss and accuracy
             train_loss = train_loss / train_num
-            train_accuracy = train_correct / train_num
+            train_accuracy = train_correct.cpu().item() / train_num
 
             # print summary for this epoch
             print('\rEpoch {:3} finished.\t\t\t\nTraining Accuracy: {:5.2%}\nTraining Loss: {:10.7f}'.format(
@@ -260,7 +260,7 @@ class Trainer:
 
             # compute validation loss and accuracy
             val_loss = val_loss / val_num
-            val_accuracy = val_correct / val_num
+            val_accuracy = val_correct.cpu().item() / val_num
 
             # print validation stats
             print('Validation Accuracy: {:5.2%}\nValidation Loss: {:10.7f}'.format(
