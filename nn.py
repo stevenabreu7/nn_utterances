@@ -178,11 +178,12 @@ class Trainer:
                 epoch_loss += loss.data.item()
 
                 if batch_idx % 10 == 0 and batch_idx > 0:
-                    print('\rprogress: {:7.3f}% correct: {:7d} accuracy: {:2.3f}%'.format(
+                    print('progress: {:7.3f}% correct: {:7d} accuracy: {:2.3f}%'.format(
                         batch_idx * train_loader.batch_size * 100 / len(train_loader.dataset),
                         correct.cpu().item(),
                         correct.cpu().item() * 100 / (batch_idx * train_loader.batch_size)
-                    ), end='')
+                    ))
+                    print(correct / num_predicted)
 
             self.model.eval()
             total_loss = epoch_loss / num_predicted
