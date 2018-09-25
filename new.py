@@ -97,7 +97,7 @@ class CustomNetwork(nn.Module):
         self.layer4 = nn.Linear(1000, 500)
         self.layer4b = nn.modules.BatchNorm1d(500)
         self.layer5 = nn.Linear(500, 250)
-        self.layer51b = nn.modules.BatchNorm1d(250)
+        self.layer5b = nn.modules.BatchNorm1d(250)
         self.layer6 = nn.Linear(250, 250)
         self.layer6b = nn.modules.BatchNorm1d(250)
         self.layer7 = nn.Linear(250, output_n)
