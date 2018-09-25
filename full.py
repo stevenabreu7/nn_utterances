@@ -298,10 +298,10 @@ class CustomNetwork(torch.nn.Module):
 # model - 1000x1000x1000x500x250x250
 name = 'test_model'
 net = CustomNetwork(trainer.input_dim, trainer.output_dim)
-epochs = 5
+epochs = 10
 criterion = torch.nn.CrossEntropyLoss()
-# optimizer = torch.optim.SGD(net.parameters(), lr=0.001)
-optimizer = torch.optim.Adam(net.parameters(), lr=0.001, weight_decay=0.0001)
+optimizer = torch.optim.SGD(net.parameters(), lr=0.001)
+# optimizer = torch.optim.Adam(net.parameters(), lr=0.001, weight_decay=0.0001)
 # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.3)
 scheduler = None
 logging = True
