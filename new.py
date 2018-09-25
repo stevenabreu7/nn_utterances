@@ -294,7 +294,7 @@ net = CustomNetwork(context)
 net.apply(init_xavier)
 
 # training parameters
-optimizer = torch.optim.Adam(net.parameters(), lr=5e-4)#, weight_decay=0.0001)
+optimizer = torch.optim.Adam(net.parameters(), lr=5e-4, weight_decay=0.0001)
 criterion = nn.modules.loss.CrossEntropyLoss()
 
 # initialize the trainer
