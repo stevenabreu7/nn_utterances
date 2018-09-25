@@ -169,8 +169,8 @@ class Trainer:
 
         for epoch in range(epochs):
 
-            # NOTE do we need this?
-            self.net.train()
+            if scheduler:
+                scheduler.step()
 
             ##############################
             # TRAINING DATA
@@ -219,10 +219,7 @@ class Trainer:
                         batch_i * self.train_loader.batch_size / len(self.train_loader.dataset),
                         train_correct.cpu().item() / ((batch_i + 1) * self.train_loader.batch_size)
                     ), end='')
-                
-            # NOTE do we need this?
-            self.net.eval()
-            
+
             # compute epoch loss and accuracy
             train_loss = train_loss / train_num
             train_accuracy = train_correct.cpu().item() / train_num
@@ -296,7 +293,7 @@ def init_xavier(m):
 # data parameters
 context = 15
 batch_size = 10000
-pca = 10
+pca = None
 
 # datasets and loaders
 print('Loading datasets')
@@ -309,11 +306,12 @@ net = CustomNetwork(context)
 net.apply(init_xavier)
 
 # training parameters
-optimizer = torch.optim.Adam(net.parameters(), lr=5e-4, weight_decay=0.0001)
+optimizer = torch.optim.Adam(net.parameters(), lr=1e-3, weight_decay=0.0001)
+scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.3)
 criterion = nn.modules.loss.CrossEntropyLoss()
 
 # initialize the trainer
-trainer = Trainer(train_loader, val_loader, 'new_test', net, optimizer, criterion, None)
+trainer = Trainer(train_loader, val_loader, 'lr_decay', net, optimizer, criterion, scheduler)
 
 # run the training
 epochs = 10
