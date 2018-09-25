@@ -238,30 +238,47 @@ class Model():
         self.scheduler = scheduler 
         self.logging = logging
 
+def init_xavier(m):
+    if type(m) == torch.nn.Linear:
+        fan_in = m.weight.size()[1]
+        fan_out = m.weight.size()[0]
+        std = np.sqrt(2.0 / (fan_in + fan_out))
+        m.weight.data.normal_(0, std)
+
 # general initialization
-padding, context = 10, 10
-batch_size = 5000
+padding, context = 15, 15
+batch_size = 10000
 trainer = Trainer('data/train.npy', 'data/train_labels.npy', 'data/dev.npy', 'data/dev_labels.npy', padding, context, batch_size)
 
-# model - 200x200x200
+# model - 1000x1000x1000x500x250x250
 name = 'test_model'
 net = torch.nn.Sequential(
-    torch.nn.Linear(trainer.input_dim, 200),
-    torch.nn.BatchNorm1d(200),
+    torch.nn.Linear(trainer.input_dim, 1000),
+    torch.nn.BatchNorm1d(1000),
     torch.nn.LeakyReLU(),
-    torch.nn.Linear(200, 200),
-    torch.nn.BatchNorm1d(200),
+    torch.nn.Linear(1000, 1000),
+    torch.nn.BatchNorm1d(1000),
     torch.nn.LeakyReLU(),
-    torch.nn.Linear(200, 200),
-    torch.nn.BatchNorm1d(200),
+    torch.nn.Linear(1000, 1000),
+    torch.nn.BatchNorm1d(1000),
     torch.nn.LeakyReLU(),
-    torch.nn.Linear(200, trainer.output_dim)
+    torch.nn.Linear(1000, 500),
+    torch.nn.BatchNorm1d(500),
+    torch.nn.LeakyReLU(),
+    torch.nn.Linear(500, 250),
+    torch.nn.BatchNorm1d(250),
+    torch.nn.LeakyReLU(),
+    torch.nn.Linear(250, 250),
+    torch.nn.BatchNorm1d(250),
+    torch.nn.LeakyReLU(),
+    torch.nn.Linear(250, trainer.output_dim)
 )
-epochs = 10
+net.apply(init_xavier)
+epochs = 5
 criterion = torch.nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(net.parameters(), lr=0.001)
+# optimizer = torch.optim.SGD(net.parameters(), lr=0.001)
 optimizer = torch.optim.Adam(net.parameters(), lr=0.001)
-scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.3)
+# scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.3)
 scheduler = None
 logging = True
 # save it into a model
