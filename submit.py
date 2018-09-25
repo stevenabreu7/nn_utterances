@@ -47,5 +47,5 @@ for ind in index_map:
 print('Writing results')
 with open('result.txt', 'w') as f:
     f.write('id,label\n')
-    for i in range(prediction.shape[0]):
+    for i in range(len(prediction)):
         f.write('{},{}\n'.format(i, prediction[i]))
