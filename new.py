@@ -103,6 +103,8 @@ class CustomNetwork(nn.Module):
         self.layer7 = nn.Linear(250, output_n)
     
     def forward(self, x):
+        print('x shape')
+        print(x.shape)
         x = self.layer1(x)
         x = self.layer1b(x)
         x = F.leaky_relu(x)
@@ -126,7 +128,7 @@ class CustomNetwork(nn.Module):
 
 class Trainer:
     def __init__(self, train_loader, val_loader, name, net, optimizer, criterion, scheduler):
-        print('Loading Trainer class for {}. '.format(name), end='')
+        print('Loading Trainer class for {}. '.format(name))
         # save the loaders
         self.update_data(train_loader, val_loader)
         # update training model
