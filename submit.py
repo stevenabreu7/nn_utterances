@@ -41,7 +41,7 @@ print('Computing output')
 prediction = []
 for ind in index_map:
     data = test_data[ind - context : ind + context + 1].view(-1)
-    output = model(test_data)
+    output = model(data)
     prediction.append(output.data.max(1, keepdim = True)[1])
 
 print('Writing results')
