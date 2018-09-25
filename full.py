@@ -53,7 +53,8 @@ class Trainer():
                 scheduler.step()
 
             # performance metrics for training set
-            train_accuracy = 0
+            train_correct = 0
+            train_count = 0
             train_loss = []
 
             # train the network
@@ -78,17 +79,19 @@ class Trainer():
                 batch_correct = (batch_prediction.numpy() == batch_labels.cpu().detach().numpy()).sum()
                 
                 # track overall epoch performance
-                train_accuracy += batch_correct
+                train_correct += batch_correct
+                train_count += batch_data.shape[0]
                 train_loss.append(batch_loss.cpu().detach())
             
-            train_accuracy /= len(self.train_loader.dataset)
+            train_accuracy = train_correct / train_count
 
             # print statistics
             print('\rValidation epoch {:4}'.format(epoch + 1), end=' ' * 30)
             
             # performance metrics for validation set
             val_loss = []
-            val_accuracy = 0
+            val_correct = 0
+            val_count = 0
             
             for batch_n, (batch_data, batch_labels) in enumerate(self.val_loader):
                 
@@ -104,10 +107,11 @@ class Trainer():
                 batch_correct += (batch_prediction.numpy() == batch_labels.cpu().detach().numpy()).sum()
 
                 # track overall epoch performance
-                val_accuracy += batch_correct
+                val_correct += batch_correct
+                val_count += batch_data.shape[0]
                 val_loss.append(batch_loss.cpu().detach())
 
-            val_accuracy /= len(self.val_loader.dataset)
+            val_accuracy = val_correct / val_count
                 
             # print the statistics
             # print("Training loss :",train_loss)
