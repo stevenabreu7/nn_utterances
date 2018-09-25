@@ -8,74 +8,128 @@ from torch.autograd.variable import Variable
 LEN_FRAME = 40
 LEN_PHONEME = 138
 
-class CustomDataset(Dataset):
-    def __init__(self, utterances_path, labels_path, context, pca=None):
-        """ Class that contains the dataset for this task.
+# class CustomDataset(Dataset):
+#     def __init__(self, utterances_path, labels_path, context, pca=None):
+#         """ Class that contains the dataset for this task.
 
-        The input data is a list of k utterances, each containing n_k 
-        frames, with each frame having 40 dimensions.
-        The input labels is a list of k utterances, each containing n_k 
-        labels, with integers between 0 and 137.
+#         The input data is a list of k utterances, each containing n_k 
+#         frames, with each frame having 40 dimensions.
+#         The input labels is a list of k utterances, each containing n_k 
+#         labels, with integers between 0 and 137.
         
-        The resulting data is a flat list of all frames, separated by 
-        x zeros, with x being the context.
-        """
-        self.context = context 
+#         The resulting data is a flat list of all frames, separated by 
+#         x zeros, with x being the context.
+#         """
+#         self.context = context 
 
-        # padding for each utterance
-        padding = np.zeros((self.context, LEN_FRAME))
+#         # padding for each utterance
+#         padding = np.zeros((self.context, LEN_FRAME))
 
-        # load data from files
-        self.data = np.load(utterances_path, encoding='bytes')
-        self.labels = np.load(labels_path, encoding='bytes')
+#         # load data from files
+#         self.data = np.load(utterances_path, encoding='bytes')
+#         self.labels = np.load(labels_path, encoding='bytes')
 
-        # index mapping for retrieving items
-        self.index_map = []
-        actual_i = 0
+#         # index mapping for retrieving items
+#         self.index_map = []
+#         actual_i = 0
 
-        for i in range(self.data.shape[0]):
-            # pad each utterance with zeros before
-            self.data[i] = np.concatenate([padding, self.data[i]])
-            # adjust index
-            actual_i += self.context
-            for _ in range(self.data[i].shape[0]):
-                self.index_map.append(actual_i)
-                actual_i += 1
-        # pad after the last instance as well
-        self.data[i] = np.concatenate([self.data[i], padding])
+#         for i in range(self.data.shape[0]):
+#             # pad each utterance with zeros before
+#             self.data[i] = np.concatenate([padding, self.data[i]])
+#             # adjust index
+#             actual_i += self.context
+#             for _ in range(self.data[i].shape[0]):
+#                 self.index_map.append(actual_i)
+#                 actual_i += 1
+#         # pad after the last instance as well
+#         self.data[i] = np.concatenate([self.data[i], padding])
         
-        # save data as array with proper dimensions
-        self.data = np.concatenate(self.data)
-        self.data = torch.tensor(self.data).float()
-        # save labels as 1d array
-        self.labels = np.concatenate(self.labels)
-        self.labels = torch.tensor(self.labels)
+#         # save data as array with proper dimensions
+#         self.data = np.concatenate(self.data)
+#         self.data = torch.tensor(self.data).float()
+#         # save labels as 1d array
+#         self.labels = np.concatenate(self.labels)
+#         self.labels = torch.tensor(self.labels)
         
-        # save the length of each data point
-        self.el_length = (2 * self.context + 1) * LEN_FRAME
+#         # save the length of each data point
+#         self.el_length = (2 * self.context + 1) * LEN_FRAME
     
+#     def __len__(self):
+#         """ Get the number of instances in the dataset.
+#         (i.e. the number of labels)
+#         """
+#         return self.labels.shape[0]
+
+#     def __getitem__(self, i):
+#         """ Return the i-th frame and label of the dataset.
+#         We have to account for the padding.
+#         """
+#         a = self.index_map[i] - self.context
+#         b = self.index_map[i] + self.context
+#         X = self.data[a : b+1].view(-1)
+#         y = self.labels[i]
+#         return X, y
+
+# def load_data(context, pca=None):
+#     """ Return the train and val dataset, with a certain context.
+#     """
+#     train_dataset = CustomDataset('data/train.npy', 'data/train_labels.npy', context)
+#     val_dataset = CustomDataset('data/dev.npy', 'data/dev_labels.npy', context)
+#     return train_dataset, val_dataset
+
+
+def load_data(context):
+    train_x = np.load('data/train.npy', encoding='bytes')
+    train_y = np.load('data/train_labels.npy', encoding='bytes')
+    train = PhonemeDataset(train_x, train_y, context)
+    dev_x = np.load('data/dev.npy', encoding='bytes')
+    dev_y = np.load('data/dev_labels.npy', encoding='bytes')
+    dev = PhonemeDataset(dev_x, dev_y, context)
+    return train, dev
+
+
+class PhonemeDataset(Dataset):
+    def __init__(self, utterances, utterance_labels, context):
+        self.context = context
+        padding = np.array([[0] * LEN_FRAME for _ in range(context)])
+
+        if self.context:
+            frames = []
+            current_frame = 0
+            self._idx_map = []
+            for utterance in utterances:
+                frames.append(padding)
+                frames.append(utterance)
+                frames.append(padding)
+
+                current_frame += self.context
+                for _ in range(utterance.shape[0]):
+                    self._idx_map.append(current_frame)
+                    current_frame += 1
+                current_frame += self.context
+            self.frames = np.concatenate(frames, axis=0)
+        else:
+            self.frames = np.concatenate(utterances)
+            self._idx_map = list(range(self.frames.shape[0]))
+
+        self.frames = torch.tensor(self.frames).float()
+        self.labels = torch.tensor(np.concatenate(utterance_labels))
+        self.instance_size = (2 * self.context + 1) * LEN_FRAME
+
     def __len__(self):
-        """ Get the number of instances in the dataset.
-        (i.e. the number of labels)
-        """
+        # changed
         return self.labels.shape[0]
 
-    def __getitem__(self, i):
-        """ Return the i-th frame and label of the dataset.
-        We have to account for the padding.
-        """
-        a = self.index_map[i] - self.context
-        b = self.index_map[i] + self.context
-        X = self.data[a : b+1].view(-1)
-        y = self.labels[i]
-        return X, y
+    def __getitem__(self, idx):
+        idx_left = self._idx_map[idx] - self.context
+        idx_right = self._idx_map[idx] + self.context + 1
+        
+        instance = self.frames[idx_left:idx_right].view(-1)
 
-def load_data(context, pca=None):
-    """ Return the train and val dataset, with a certain context.
-    """
-    train_dataset = CustomDataset('data/train.npy', 'data/train_labels.npy', context)
-    val_dataset = CustomDataset('data/dev.npy', 'data/dev_labels.npy', context)
-    return train_dataset, val_dataset
+        label = self.labels[idx]
+
+        return (instance, label)
+
 
 class CustomNetwork(nn.Module):
     def __init__(self, context):
@@ -205,7 +259,7 @@ class Trainer:
                     print('\rEpoch {:3} Progress {:5.2f} Accuracy {:5.2f}'.format(
                         epoch + 1, 
                         batch_i * self.train_loader.batch_size / len(self.train_loader.dataset),
-                        train_correct.cpu().item() / ((batch_i + 1) * self.train_loader.batch_size)
+                        train_correct.cpu().item() / train_num
                     ), end='')
                 
             # NOTE do we need this?
