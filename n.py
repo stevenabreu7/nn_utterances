@@ -13,6 +13,7 @@ from torch.functional import F
 FRAME_LEN = 40
 LEN_FRAME = 40
 NUM_PHONEMES = 138
+LEN_PHONEMES = 138
 
 class CustomDataset(Dataset):
     def __init__(self, utterances_path, labels_path, context, pca=None):
@@ -89,7 +90,7 @@ class PhonemeModel(nn.Module):
         Architecture: 
             1000 x 1000 x 1000 x 500 x 250 x 250
         """
-        super(CustomNetwork, self).__init__()
+        super(PhonemeModel, self).__init__()
         # input and output size
         input_n = (2 * context + 1) * LEN_FRAME
         output_n = LEN_PHONEME
