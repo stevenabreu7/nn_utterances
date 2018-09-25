@@ -85,7 +85,7 @@ class CustomNetwork(nn.Module):
         """
         super(CustomNetwork, self).__init__()
         # input and output size
-        input_n = (context + 1) * LEN_FRAME
+        input_n = (2 * context + 1) * LEN_FRAME
         output_n = LEN_PHONEME
         # layers
         self.layer1 = nn.Linear(input_n, 1000)
@@ -103,8 +103,6 @@ class CustomNetwork(nn.Module):
         self.layer7 = nn.Linear(250, output_n)
     
     def forward(self, x):
-        print('x shape')
-        print(x.shape)
         x = self.layer1(x)
         x = self.layer1b(x)
         x = F.leaky_relu(x)
@@ -286,6 +284,7 @@ context = 10
 batch_size = 10000
 
 # datasets and loaders
+print('Loading datasets')
 train_dataset, val_dataset = load_data(context)
 train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=RandomSampler(train_dataset))
 val_loader = DataLoader(val_dataset, batch_size=batch_size, sampler=RandomSampler(val_dataset))
