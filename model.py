@@ -281,29 +281,30 @@ def init_xavier(m):
         std = np.sqrt(2.0 / (fan_in + fan_out))
         m.weight.data.normal_(0,std)
 
-# data parameters
-context = 15
-batch_size = 10000
+if __name__ == '__main__':
+    # data parameters
+    context = 15
+    batch_size = 10000
 
-# datasets and loaders
-print('Loading datasets')
-train_dataset, val_dataset = load_data(context)
-train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=RandomSampler(train_dataset))
-val_loader = DataLoader(val_dataset, batch_size=batch_size, sampler=RandomSampler(val_dataset))
+    # datasets and loaders
+    print('Loading datasets')
+    train_dataset, val_dataset = load_data(context)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=RandomSampler(train_dataset))
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, sampler=RandomSampler(val_dataset))
 
-# model
-net = CustomNetwork(context)
-net.apply(init_xavier)
+    # model
+    net = CustomNetwork(context)
+    net.apply(init_xavier)
 
-# training parameters
-optimizer = torch.optim.Adam(net.parameters(), lr=1e-3, weight_decay=0.0001)
-scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.3)
-criterion = nn.modules.loss.CrossEntropyLoss()
+    # training parameters
+    optimizer = torch.optim.Adam(net.parameters(), lr=1e-3, weight_decay=0.0001)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.3)
+    criterion = nn.modules.loss.CrossEntropyLoss()
 
-# initialize the trainer
-trainer = Trainer(train_loader, val_loader, 'lr_decay', net, optimizer, criterion, scheduler)
+    # initialize the trainer
+    trainer = Trainer(train_loader, val_loader, 'lr_decay', net, optimizer, criterion, scheduler)
 
-# run the training
-epochs = 10
-trainer.train(epochs)
-trainer.save_model()
+    # run the training
+    epochs = 10
+    trainer.train(epochs)
+    trainer.save_model()

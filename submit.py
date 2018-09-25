@@ -1,5 +1,6 @@
 import torch 
 import numpy as np
+from model import CustomNetwork
 
 model_path = input('Enter path to model: ')
 
