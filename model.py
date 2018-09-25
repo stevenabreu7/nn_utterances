@@ -26,8 +26,9 @@ class CustomDataset(Dataset):
         print('Running PCA...')
         if pca:
             LEN_FRAME = pca 
-            p = PCA(n_components=pca)
-            data = p.fit_transform(data)
+            for i in range(data.shape[0]):
+                p = PCA(n_components=pca)
+                data[i] = p.fit_transform(data[i])
         print('Done with PCA')
 
         # padding for each utterance
