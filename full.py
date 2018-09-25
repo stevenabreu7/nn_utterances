@@ -60,7 +60,7 @@ class Trainer():
             # train the network
             for batch_n, (batch_data, batch_labels) in enumerate(self.train_loader):
                 
-                print('\rTraining epoch {:4} Batch {:6} ({:.2%})'.format(epoch + 1, batch_n, batch_n / len(self.train_loader)), end=' ' * 10)
+                print('\rTraining epoch {:4} Batch {:6} ({:.2%})\n'.format(epoch + 1, batch_n, batch_n / len(self.train_loader)), end=' ' * 10)
 
                 if gpu:
                     batch_data, batch_labels = batch_data.cuda(), batch_labels.cuda()
@@ -77,6 +77,9 @@ class Trainer():
                 # performance for this batch
                 batch_prediction = batch_output.cpu().detach().argmax(dim=1)
                 batch_correct = (batch_prediction.numpy() == batch_labels.cpu().detach().numpy()).sum()
+
+                print(batch_correct)
+                print(batch_data.shape)
                 
                 # track overall epoch performance
                 train_correct += batch_correct
@@ -115,9 +118,9 @@ class Trainer():
                 
             # print the statistics
             # print("Training loss :",train_loss)
-            print("Training accuracy :",train_accuracy)
+            print("Training accuracy: {:.4f}".format(train_accuracy))
             # print("Validation loss :",val_loss)
-            print("Validation accuracy :",val_accuracy)
+            print("Validation accuracy:{:.4f}".format(val_accuracy))
             print()
             
             # log data to tensorboard
