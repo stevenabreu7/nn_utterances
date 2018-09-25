@@ -268,6 +268,8 @@ class Trainer:
                 val_loss
             ))
 
+            torch.save(self.net, 'models/{}_{}'.format(self.name, epoch))
+
         # move network back to CPU if needed
         self.net = self.net.cpu() if self.gpu else self.net 
 
