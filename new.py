@@ -46,7 +46,7 @@ class CustomDataset(Dataset):
         self.data = np.concatenate(frames)
         self.data = torch.tensor(self.data).float()
         # save labels as 1d array
-        self.labels = np.concatenate(self.labels)
+        self.labels = np.concatenate(labels)
         self.labels = torch.tensor(self.labels)
         
         # save the length of each data point
