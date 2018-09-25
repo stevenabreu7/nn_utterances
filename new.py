@@ -280,7 +280,7 @@ def init_xavier(m):
         m.weight.data.normal_(0,std)
 
 # data parameters
-context = 10
+context = 14
 batch_size = 10000
 
 # datasets and loaders
