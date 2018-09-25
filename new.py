@@ -202,7 +202,7 @@ class Trainer:
 
                 # print training progress
                 if batch_i % 10 == 0:
-                    print('\rEpoch {:3} Progress {:6.3%} Accuracy {:6.3%}'.format(
+                    print('\rEpoch {:3} Progress {:5.2%} Accuracy {:5.2%}'.format(
                         epoch + 1, 
                         batch_i * self.train_loader.batch_size / len(self.train_loader.dataset),
                         train_correct.cpu().item() / train_num
