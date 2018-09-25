@@ -2,7 +2,6 @@ import torch
 import numpy as np 
 import torch.nn as nn
 from torch.functional import F
-from sklearn.decomposition import PCA
 from torch.utils.data import Dataset, DataLoader, RandomSampler
 from torch.autograd.variable import Variable
 
@@ -10,7 +9,7 @@ LEN_FRAME = 40
 LEN_PHONEME = 138
 
 class CustomDataset(Dataset):
-    def __init__(self, data, labels, context, pca=None):
+    def __init__(self, data, labels, context):
         """ Class that contains the dataset for this task.
 
         The input data is a list of k utterances, each containing n_k 
@@ -21,15 +20,7 @@ class CustomDataset(Dataset):
         The resulting data is a flat list of all frames, separated by 
         x zeros, with x being the context.
         """
-        self.context = context 
-
-        print('Running PCA...')
-        if pca:
-            LEN_FRAME = pca 
-            for i in range(data.shape[0]):
-                p = PCA(n_components=pca)
-                data[i] = p.fit_transform(data[i])
-        print('Done with PCA')
+        self.context = context
 
         # padding for each utterance
         padding = np.zeros((self.context, LEN_FRAME))
@@ -78,15 +69,15 @@ class CustomDataset(Dataset):
         y = self.labels[i]
         return X, y
 
-def load_data(context, pca=None):
+def load_data(context):
     """ Return the train and val dataset, with a certain context.
     """
     train_data = np.load('data/train.npy', encoding='bytes')
     train_labels = np.load('data/train_labels.npy', encoding='bytes')
     val_data = np.load('data/dev.npy', encoding='bytes')
     val_labels = np.load('data/dev_labels.npy', encoding='bytes')
-    train_dataset = CustomDataset(train_data, train_labels, context, pca)
-    val_dataset = CustomDataset(val_data, val_labels, context, pca)
+    train_dataset = CustomDataset(train_data, train_labels, context)
+    val_dataset = CustomDataset(val_data, val_labels, context)
     return train_dataset, val_dataset
 
 class CustomNetwork(nn.Module):
@@ -293,11 +284,10 @@ def init_xavier(m):
 # data parameters
 context = 15
 batch_size = 10000
-pca = None
 
 # datasets and loaders
 print('Loading datasets')
-train_dataset, val_dataset = load_data(context, pca=pca)
+train_dataset, val_dataset = load_data(context)
 train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=RandomSampler(train_dataset))
 val_loader = DataLoader(val_dataset, batch_size=batch_size, sampler=RandomSampler(val_dataset))
 
