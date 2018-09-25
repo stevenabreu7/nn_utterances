@@ -158,7 +158,7 @@ class Trainer:
         for epoch in range(epochs):
 
             # NOTE do we need this?
-            # self.net.train()
+            self.net.train()
 
             ##############################
             # TRAINING DATA
@@ -209,14 +209,14 @@ class Trainer:
                     ), end='')
                 
             # NOTE do we need this?
-            # self.net.eval()
+            self.net.eval()
             
             # compute epoch loss and accuracy
             train_loss = train_loss / train_num
             train_accuracy = train_correct / train_num
 
             # print summary for this epoch
-            print('\rEpoch {:3} finished.\nTraining Accuracy: {:5.2%}\nTraining Loss: {:5.2%}'.format(
+            print('\rEpoch {:3} finished.\t\t\t\nTraining Accuracy: {:5.2%}\nTraining Loss: {:5.2%}'.format(
                 epoch + 1, 
                 train_accuracy, 
                 train_loss
