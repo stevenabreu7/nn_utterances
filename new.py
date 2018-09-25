@@ -198,7 +198,7 @@ class Trainer:
                 self.optimizer.step()
 
                 # sum up this batch's loss
-                train_loss += batch_loss.item().data[0]
+                train_loss += batch_loss.data.item()
 
                 # print training progress
                 if batch_i % 10 == 0:
@@ -253,7 +253,7 @@ class Trainer:
                 batch_loss = self.criterion(batch_output, batch_labels)
 
                 # sum up this batch's loss
-                val_loss += batch_loss.item().data[0]
+                val_loss += batch_loss.data.item()
 
             # compute validation loss and accuracy
             val_loss = val_loss / val_num
