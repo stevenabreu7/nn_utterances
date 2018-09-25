@@ -202,7 +202,7 @@ class Trainer:
 
                 # print training progress
                 if batch_i % 10 == 0:
-                    print('\rEpoch {:3} Progress {:5.2%} Accuracy {:5.2%}'.format(
+                    print('\rEpoch {:3} Progress {:5.2f} Accuracy {:5.2f}'.format(
                         epoch + 1, 
                         batch_i * self.train_loader.batch_size / len(self.train_loader.dataset),
                         train_correct.cpu().item() / ((batch_i + 1) * self.train_loader.batch_size)
@@ -216,7 +216,7 @@ class Trainer:
             train_accuracy = train_correct / train_num
 
             # print summary for this epoch
-            print('\rEpoch {:3} finished.\t\t\t\nTraining Accuracy: {:5.2%}\nTraining Loss: {:5.2%}'.format(
+            print('\rEpoch {:3} finished.\t\t\t\nTraining Accuracy: {:5.2f}\nTraining Loss: {:5.2f}'.format(
                 epoch + 1, 
                 train_accuracy, 
                 train_loss
@@ -260,7 +260,7 @@ class Trainer:
             val_accuracy = val_correct / val_num
 
             # print validation stats
-            print('Validation Accuracy: {:5.2%}\nValidation Loss: {:5.2%}'.format(
+            print('Validation Accuracy: {:5.2f}\nValidation Loss: {:5.2f}'.format(
                 val_accuracy, 
                 val_loss
             ))
