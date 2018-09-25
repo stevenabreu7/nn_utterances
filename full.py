@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 import tensorflow as tf
+from torch.functional import F
 from torch.utils.data import DataLoader
 from torch.utils.data.dataset import Dataset
 
@@ -8,10 +9,12 @@ class Trainer():
     def __init__(self, trainx, trainy, valx, valy, padding, context, batch_size):
         self.input_dim = 40 * (2 * padding + 1)
         self.output_dim = 138
+        print('Loading datasets', end='')
         train_dataset = CustomDataset('data/train.npy', 'data/train_labels.npy', padding, context)
         val_dataset = CustomDataset('data/dev.npy', 'data/dev_labels.npy', padding, context)
         self.train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
         self.val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
+        print('\rLoaded datasets.   ')
         
     def training_routine(self, model):
         """ Train a neural network.
@@ -60,7 +63,7 @@ class Trainer():
             # train the network
             for batch_n, (batch_data, batch_labels) in enumerate(self.train_loader):
                 
-                print('\rTraining epoch {:4} Batch {:6} ({:.2%})\n'.format(epoch + 1, batch_n, batch_n / len(self.train_loader)), end=' ' * 10)
+                print('\rTraining epoch {:4} Batch {:6} ({:.2%})'.format(epoch + 1, batch_n, batch_n / len(self.train_loader)), end=' ' * 10)
 
                 if gpu:
                     batch_data, batch_labels = batch_data.cuda(), batch_labels.cuda()
@@ -77,9 +80,6 @@ class Trainer():
                 # performance for this batch
                 batch_prediction = batch_output.cpu().detach().argmax(dim=1)
                 batch_correct = (batch_prediction.numpy() == batch_labels.cpu().detach().numpy()).sum()
-
-                print(batch_correct)
-                print(batch_data.shape)
                 
                 # track overall epoch performance
                 train_correct += batch_correct
@@ -89,7 +89,7 @@ class Trainer():
             train_accuracy = train_correct / train_count
 
             # print statistics
-            print('\rValidation epoch {:4}'.format(epoch + 1), end=' ' * 30)
+            print('\nValidation epoch {:4}'.format(epoch + 1))
             
             # performance metrics for validation set
             val_loss = []
@@ -107,7 +107,7 @@ class Trainer():
                 
                 # performance for this batch
                 batch_prediction = batch_output.cpu().detach().argmax(dim=1)
-                batch_correct += (batch_prediction.numpy() == batch_labels.cpu().detach().numpy()).sum()
+                batch_correct = (batch_prediction.numpy() == batch_labels.cpu().detach().numpy()).sum()
 
                 # track overall epoch performance
                 val_correct += batch_correct
@@ -117,9 +117,7 @@ class Trainer():
             val_accuracy = val_correct / val_count
                 
             # print the statistics
-            # print("Training loss :",train_loss)
             print("Training accuracy: {:.4f}".format(train_accuracy))
-            # print("Validation loss :",val_loss)
             print("Validation accuracy:{:.4f}".format(val_accuracy))
             print()
             
@@ -257,34 +255,53 @@ padding, context = 15, 15
 batch_size = 10000
 trainer = Trainer('data/train.npy', 'data/train_labels.npy', 'data/dev.npy', 'data/dev_labels.npy', padding, context, batch_size)
 
+# model
+class CustomNetwork(torch.nn.Module):
+    def __init__(self, input_size, output_size):
+        super(CustomNetwork, self).__init__()
+        self.layer1 = torch.nn.Linear(input_size, 1000)
+        self.layer1b = torch.nn.modules.BatchNorm1d(1000)
+        self.layer2 = torch.nn.Linear(1000, 1000)
+        self.layer2b = torch.nn.modules.BatchNorm1d(1000)
+        self.layer3 = torch.nn.Linear(1000, 1000)
+        self.layer3b = torch.nn.modules.BatchNorm1d(1000)
+        self.layer4 = torch.nn.Linear(1000, 500)
+        self.layer4b = torch.nn.modules.BatchNorm1d(500)
+        self.layer5 = torch.nn.Linear(500, 250)
+        self.layer5b = torch.nn.modules.BatchNorm1d(250)
+        self.layer6 = torch.nn.Linear(250, 250)
+        self.layer6b = torch.nn.modules.BatchNorm1d(250)
+        self.layer7 = torch.nn.Linear(250, output_size)
+        
+    def forward(self, x):
+        x = self.layer1(x)
+        x = self.layer1b(x)
+        x = F.leaky_relu(x)
+        x = self.layer2(x)
+        x = self.layer2b(x)
+        x = F.leaky_relu(x)
+        x = self.layer3(x)
+        x = self.layer3b(x)
+        x = F.leaky_relu(x)
+        x = self.layer4(x)
+        x = self.layer4b(x)
+        x = F.leaky_relu(x)
+        x = self.layer5(x)
+        x = self.layer5b(x)
+        x = F.leaky_relu(x)
+        x = self.layer6(x)
+        x = self.layer6b(x)
+        x = F.leaky_relu(x)
+        x = self.layer7(x)
+        return x
+
 # model - 1000x1000x1000x500x250x250
 name = 'test_model'
-net = torch.nn.Sequential(
-    torch.nn.Linear(trainer.input_dim, 1000),
-    torch.nn.BatchNorm1d(1000),
-    torch.nn.LeakyReLU(),
-    torch.nn.Linear(1000, 1000),
-    torch.nn.BatchNorm1d(1000),
-    torch.nn.LeakyReLU(),
-    torch.nn.Linear(1000, 1000),
-    torch.nn.BatchNorm1d(1000),
-    torch.nn.LeakyReLU(),
-    torch.nn.Linear(1000, 500),
-    torch.nn.BatchNorm1d(500),
-    torch.nn.LeakyReLU(),
-    torch.nn.Linear(500, 250),
-    torch.nn.BatchNorm1d(250),
-    torch.nn.LeakyReLU(),
-    torch.nn.Linear(250, 250),
-    torch.nn.BatchNorm1d(250),
-    torch.nn.LeakyReLU(),
-    torch.nn.Linear(250, trainer.output_dim)
-)
-net.apply(init_xavier)
+net = CustomNetwork(trainer.input_dim, trainer.output_dim)
 epochs = 5
 criterion = torch.nn.CrossEntropyLoss()
 # optimizer = torch.optim.SGD(net.parameters(), lr=0.001)
-optimizer = torch.optim.Adam(net.parameters(), lr=0.001)
+optimizer = torch.optim.Adam(net.parameters(), lr=0.001, weight_decay=0.0001)
 # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.3)
 scheduler = None
 logging = True
