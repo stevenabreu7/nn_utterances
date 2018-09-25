@@ -183,7 +183,7 @@ class Trainer:
                         correct.cpu().item(),
                         correct.cpu().item() * 100 / (batch_idx * train_loader.batch_size)
                     ))
-                    print(correct / num_predicted)
+                    print(correct.cpu().item() / num_predicted)
 
             self.model.eval()
             total_loss = epoch_loss / num_predicted
